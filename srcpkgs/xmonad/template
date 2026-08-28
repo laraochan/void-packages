@@ -1,0 +1,54 @@
+# Template file for 'xmonad'
+pkgname=xmonad
+version=0.18.1
+revision=1
+build_style=cabal
+cabal_index_state=2026-08-28T15:11:57Z
+hostmakedepends="pkg-config"
+makedepends="libX11-devel libXinerama-devel libXrandr-devel libXScrnSaver-devel"
+depends="ghc libX11-devel libXinerama-devel libXrandr-devel libXScrnSaver-devel"
+short_desc="Tiling window manager fully configurable in Haskell"
+maintainer="larao <me@larao.dev>"
+license="BSD-3-Clause"
+homepage="https://xmonad.org"
+distfiles="https://hackage.haskell.org/package/${pkgname}-${version}/${pkgname}-${version}.tar.gz"
+checksum=988b5f3104ac03aa078248afea7efcaed86661dfb239efd44995f58cd4f7a1f0
+nopie_files="/usr/libexec/xmonad"
+nocross=yes
+make_check=no # Tests require additional Haskell packages
+
+do_configure() {
+	cabal --store-dir="$wrksrc/cabal-store" update
+	cabal --store-dir="$wrksrc/cabal-store" configure \
+		--prefix=/usr --index-state="$cabal_index_state"
+}
+
+do_build() {
+	cabal --store-dir="$wrksrc/cabal-store" build ${makejobs}
+	cabal --store-dir="$wrksrc/cabal-store" install --lib base . \
+		--package-env="$wrksrc/xmonad.env" \
+		--index-state="$cabal_index_state" --overwrite-policy=always
+}
+
+do_install() {
+	local ghc_version
+	ghc_version="$(ghc --numeric-version)"
+
+	vinstall "$(cabal --store-dir="$wrksrc/cabal-store" list-bin exe:xmonad)" \
+		755 usr/libexec xmonad
+	vbin "$FILESDIR/xmonad-wrapper" xmonad
+	vmkdir usr/lib/xmonad/store
+	cp -a "$wrksrc/cabal-store/ghc-${ghc_version}" \
+		"$DESTDIR/usr/lib/xmonad/store"
+	find "$DESTDIR/usr/lib/xmonad/store/ghc-${ghc_version}" -maxdepth 1 \
+		-type d -name 'hsc2hs-*-e-hsc2hs-*' -exec rm -rf -- {} +
+	find "$DESTDIR/usr/lib/xmonad/store/ghc-${ghc_version}" \
+		-type f -name '*.so' -delete
+	vinstall "$wrksrc/xmonad.env" 644 usr/lib/xmonad package.env
+	sed -i 's|/builddir/[^/]*/cabal-store|/usr/lib/xmonad/store|g' \
+		"$DESTDIR/usr/lib/xmonad/package.env" \
+		"$DESTDIR/usr/lib/xmonad/store/ghc-${ghc_version}/package.db/"*.conf
+	ghc-pkg recache --package-db="$DESTDIR/usr/lib/xmonad/store/ghc-${ghc_version}/package.db"
+	vman man/xmonad.1
+	vlicense LICENSE
+}

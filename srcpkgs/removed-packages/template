@@ -1032,7 +1032,6 @@ replaces="
  xf86-video-vmware<=13.4.0_2
  xlennart<=1.1.1_1
  xmonad-contrib<=0.16_3
- xmonad<=0.15_5
  xnoise-devel<=0.2.21_4
  xnoise<=0.2.21_4
  xnp2<=0.86_2
