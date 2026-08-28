@@ -1,0 +1,18 @@
+# Template file for 'opencode'
+pkgname=opencode
+version=1.18.23
+revision=1
+archs="x86_64"
+nostrip=yes
+
+short_desc="Open source AI coding agent"
+maintainer="larao <me@larao.dev>"
+license="MIT"
+homepage="https://opencode.ai/"
+changelog="https://github.com/anomalyco/opencode/releases"
+distfiles="https://github.com/anomalyco/opencode/releases/download/v${version}/opencode-linux-x64.tar.gz"
+checksum=ab7015cd8113e011a461f30a0c2b77d8299a144ff688cb62e93e8802835d7288
+
+do_install() {
+	vinstall opencode 0755 usr/bin
+}
