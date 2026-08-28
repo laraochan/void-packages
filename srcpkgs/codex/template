@@ -1,0 +1,28 @@
+# Template file for 'codex'
+pkgname=codex
+version=0.149.0
+revision=1
+archs="x86_64"
+create_wrksrc=yes
+nostrip=yes
+
+short_desc="OpenAI Codex CLI"
+maintainer="larao <me@larao.dev>"
+license="Apache-2.0"
+homepage="https://github.com/openai/codex"
+
+distfiles="https://github.com/openai/codex/releases/download/rust-v${version}/codex-package-x86_64-unknown-linux-musl.tar.gz"
+checksum=1c08ba262820b78d49ea7a93f326b6b430b72e5fe46830e433edef12e5123244
+
+do_install() {
+	vmkdir usr/lib/codex
+
+	vcopy bin usr/lib/codex
+	vcopy codex-path usr/lib/codex
+	vcopy codex-resources usr/lib/codex
+	vinstall codex-package.json 0644 usr/lib/codex
+
+	vmkdir usr/bin
+	ln -s /usr/lib/codex/bin/codex \
+		"${DESTDIR}/usr/bin/codex"
+}
