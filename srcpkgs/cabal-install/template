@@ -1,9 +1,9 @@
 # Template file for 'cabal-install'
 pkgname=cabal-install
-version=3.10.3.0
+version=3.18.1.0
 revision=1
 build_helper="haskell"
-hostmakedepends="python3 ghc curl tar"
+hostmakedepends="python3 ghc curl tar pkg-config"
 makedepends="zlib-devel"
 depends="ghc"
 short_desc="Command-line interface for Cabal and Hackage"
@@ -11,7 +11,7 @@ maintainer="Orphaned <orphan@voidlinux.org>"
 license="BSD-3-Clause"
 homepage="https://www.haskell.org/cabal/"
 distfiles="https://github.com/haskell/cabal/archive/refs/tags/cabal-install-v${version}.tar.gz"
-checksum=075fba81fca61f6957dae3a542a3213415682dd9767f6ccdf3f9059f2cd0f156
+checksum=c3d51e23a7e10cc9c13c59320267f831732d281ba3fc7897423e0b83b8221a41
 nopie_files="/usr/bin/cabal"
 nocross=yes
 
