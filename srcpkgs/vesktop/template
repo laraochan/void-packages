@@ -1,0 +1,26 @@
+# Template file for 'vesktop'
+pkgname=vesktop
+version=1.6.7
+revision=1
+archs="x86_64"
+nostrip=yes
+skiprdeps="/usr/lib/vesktop/libvulkan.so.1"
+depends="alsa-lib gtk+3 libnotify nss libXtst libcxx libatomic
+ xdg-utils libXScrnSaver hicolor-icon-theme"
+
+short_desc="Custom Discord desktop app with Vencord preinstalled"
+maintainer="larao <me@larao.dev>"
+license="GPL-3.0-or-later"
+homepage="https://vesktop.dev/"
+changelog="https://github.com/Vencord/Vesktop/releases"
+distfiles="https://github.com/Vencord/Vesktop/releases/download/v${version}/vesktop-${version}.tar.gz"
+checksum=152786c72cf97f510b3a527829568083dd5c79b723cf459c13d430b6ca385b66
+
+do_install() {
+	vmkdir usr/lib/vesktop
+	vcopy . usr/lib/vesktop
+
+	vinstall ${FILESDIR}/vesktop.desktop 0644 usr/share/applications
+	vmkdir usr/bin
+	ln -sfr "${DESTDIR}/usr/lib/vesktop/vesktop" "${DESTDIR}/usr/bin/vesktop"
+}
