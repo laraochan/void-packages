@@ -1,0 +1,51 @@
+# Template file for 'xmonad-contrib'
+pkgname=xmonad-contrib
+version=0.18.2
+revision=1
+build_style=cabal
+cabal_index_state=2026-08-28T15:11:57Z
+hostmakedepends="pkg-config"
+makedepends="libX11-devel libXinerama-devel libXrandr-devel libXft-devel
+ libXScrnSaver-devel"
+depends="ghc xmonad libX11-devel libXinerama-devel libXrandr-devel
+ libXft-devel libXScrnSaver-devel"
+short_desc="Third-party extensions for xmonad"
+maintainer="larao <me@larao.dev>"
+license="BSD-3-Clause"
+homepage="https://xmonad.org"
+distfiles="https://hackage.haskell.org/package/${pkgname}-${version}/${pkgname}-${version}.tar.gz"
+checksum=2d83efa441110d35d02ddc286c04f7661d94c18e167a815ef7a2578b2a636a4d
+nocross=yes
+make_check=no # Tests require additional Haskell packages
+
+do_configure() {
+	cabal --store-dir="$wrksrc/cabal-store" update
+	cabal --store-dir="$wrksrc/cabal-store" configure \
+		--prefix=/usr --index-state="$cabal_index_state"
+}
+
+do_build() {
+	cabal --store-dir="$wrksrc/cabal-store" build lib:xmonad-contrib ${makejobs}
+	cabal --store-dir="$wrksrc/cabal-store" install --lib xmonad . \
+		--package-env="$wrksrc/xmonad-contrib.env" \
+		--index-state="$cabal_index_state" --overwrite-policy=always
+}
+
+do_install() {
+	local ghc_version
+	ghc_version="$(ghc --numeric-version)"
+
+	vmkdir usr/lib/xmonad-contrib/store
+	cp -a "$wrksrc/cabal-store/ghc-${ghc_version}" \
+		"$DESTDIR/usr/lib/xmonad-contrib/store"
+	find "$DESTDIR/usr/lib/xmonad-contrib/store/ghc-${ghc_version}" -maxdepth 1 \
+		-type d -name 'hsc2hs-*-e-hsc2hs-*' -exec rm -rf -- {} +
+	find "$DESTDIR/usr/lib/xmonad-contrib/store/ghc-${ghc_version}" \
+		-type f -name '*.so' -delete
+	vinstall "$wrksrc/xmonad-contrib.env" 644 usr/lib/xmonad-contrib package.env
+	sed -i 's|/builddir/[^/]*/cabal-store|/usr/lib/xmonad-contrib/store|g' \
+		"$DESTDIR/usr/lib/xmonad-contrib/package.env" \
+		"$DESTDIR/usr/lib/xmonad-contrib/store/ghc-${ghc_version}/package.db/"*.conf
+	ghc-pkg recache --package-db="$DESTDIR/usr/lib/xmonad-contrib/store/ghc-${ghc_version}/package.db"
+	vlicense LICENSE
+}
